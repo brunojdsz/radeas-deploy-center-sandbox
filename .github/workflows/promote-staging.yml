@@ -1,0 +1,36 @@
+name: Promote Staging (sandbox)
+# Same inputs as the real workflow. Nothing is deployed. A digest ending in 'dead' fails on purpose so the
+# failure path (failed step names, no secrets) can be exercised.
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        type: choice
+        options: [api, web]
+        required: true
+      digest:
+        type: string
+        required: true
+      request_id:
+        type: string
+        required: true
+      requested_by:
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show inputs
+        env:
+          INPUT_DIGEST: ${{ inputs.digest }}
+          INPUT_REQUEST_ID: ${{ inputs.request_id }}
+          INPUT_REQUESTED_BY: ${{ inputs.requested_by }}
+        run: echo "request ${INPUT_REQUEST_ID} by ${INPUT_REQUESTED_BY} for ${INPUT_DIGEST}"
+      - name: Fail when the digest ends in dead
+        env:
+          INPUT_DIGEST: ${{ inputs.digest }}
+        run: |
+          if [[ "$INPUT_DIGEST" == *dead ]]; then echo "forced failure" >&2; exit 1; fi

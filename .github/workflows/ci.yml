@@ -1,0 +1,10 @@
+name: CI
+# Stands in for the real ci.yml: `ci_succeeded_for_commit` looks for a successful push run on main.
+on:
+  push:
+    branches: [main]
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "sandbox CI ok"
